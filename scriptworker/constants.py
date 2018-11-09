@@ -211,7 +211,6 @@ DEFAULT_CONFIG = frozendict({
                     # restrict production scopes to the origin repo (with cot_restricted_scopes)!
                     r"^(?P<path>/[A-Za-z0-9-]+/android-components)(/|.git|$)",
                     r"^(?P<path>/[A-Za-z0-9-]+/focus-android)(/|.git|$)",
-                    r"^(?P<path>/[A-Za-z0-9-]+/reference-browser)(/|.git|$)",
                 ),
             }),),
         }),
