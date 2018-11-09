@@ -165,6 +165,8 @@ DEFAULT_CONFIG = frozendict({
         # gecko-focus is for mozilla-mobile releases. It's named this way because it's a worker type
         # but using the gecko ChainOfTrust keys. See bug 1455290 for more details.
         "gecko-focus",
+        # staging releases can run on the regular github-worker.
+        "github-worker",
     ),
 
     # docker-image cot
@@ -205,9 +207,11 @@ DEFAULT_CONFIG = frozendict({
                 "schemes": ("https", "ssh", ),
                 "netlocs": ("github.com", ),
                 "path_regexes": (
-                    r"^(?P<path>/mozilla-mobile/focus-android)(/|.git|$)",
-                    r"^(?P<path>/mozilla-mobile/android-components)(/|.git|$)",
-                    r"^(?P<path>/mozilla-mobile/reference-browser)(/|.git|$)",
+                    # XXX We allow Github forks to run staging releases. Please make sure to
+                    # restrict production scopes to the origin repo (with cot_restricted_scopes)!
+                    r"^(?P<path>/[A-Za-z0-9-]+/android-components)(/|.git|$)",
+                    r"^(?P<path>/[A-Za-z0-9-]+/focus-android)(/|.git|$)",
+                    r"^(?P<path>/[A-Za-z0-9-]+/reference-browser)(/|.git|$)",
                 ),
             }),),
         }),
@@ -262,8 +266,10 @@ DEFAULT_CONFIG = frozendict({
                 'project:comm:thunderbird:releng:signing:cert:release-signing': 'all-release-branches',
             }),
             'mobile': frozendict({
-                'project:mobile:focus:googleplay:product:focus': 'focus-repo',
-                'project:mobile:focus:releng:signing:cert:release-signing': 'focus-repo',
+                'project:mobile:focus:googleplay:product:focus': 'focus-origin-repo',
+                'project:mobile:focus:releng:signing:cert:release-signing': 'focus-origin-repo',
+
+                'project:mobile:android-components:releng:beetmover:bucket:maven-production': 'android-components-origin-repo',
             }),
         }),
     },
@@ -354,8 +360,11 @@ DEFAULT_CONFIG = frozendict({
                 ),
             }),
             'mobile': frozendict({
-                'focus-repo': (
+                'focus-origin-repo': (
                     '/mozilla-mobile/focus-android',
+                ),
+                'android-components-origin-repo': (
+                    '/mozilla-mobile/android-components',
                 ),
             }),
         }),
