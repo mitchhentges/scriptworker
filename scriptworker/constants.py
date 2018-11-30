@@ -211,6 +211,7 @@ DEFAULT_CONFIG = frozendict({
                     # restrict production scopes to the origin repo (with cot_restricted_scopes)!
                     r"^(?P<path>/[A-Za-z0-9-]+/android-components)(/|.git|$)",
                     r"^(?P<path>/[A-Za-z0-9-]+/focus-android)(/|.git|$)",
+                    r"^(?P<path>/[A-Za-z0-9-]+/reference-browser)(/|.git|$)",
                 ),
             }),),
         }),
@@ -267,7 +268,10 @@ DEFAULT_CONFIG = frozendict({
             'mobile': frozendict({
                 'project:mobile:focus:googleplay:product:focus': 'focus-origin-repo',
                 'project:mobile:focus:releng:signing:cert:release-signing': 'focus-origin-repo',
-
+                'project:mobile:focus:releng:googleplay:product:reference-browser': 'reference-browser-origin-repo',
+                'project:mobile:focus:releng:googleplay:product:reference-browser:dep': 'reference-browser-origin-repo',
+                'project:mobile:reference-browser:releng:signing:cert:dep-signing': 'reference-browser-origin-repo',
+                'project:mobile:reference-browser:releng:signing:cert:release-signing': 'reference-browser-origin-repo',
                 'project:mobile:android-components:releng:beetmover:bucket:maven-production': 'android-components-origin-repo',
             }),
         }),
@@ -361,6 +365,9 @@ DEFAULT_CONFIG = frozendict({
             'mobile': frozendict({
                 'focus-origin-repo': (
                     '/mozilla-mobile/focus-android',
+                ),
+                'reference-browser-origin-repo': (
+                    '/mozilla-mobile/reference-browser'
                 ),
                 'android-components-origin-repo': (
                     '/mozilla-mobile/android-components',
