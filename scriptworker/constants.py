@@ -285,8 +285,6 @@ DEFAULT_CONFIG = frozendict({
                 'project:mobile:focus:releng:signing:cert:release-signing': 'focus-repo',
 
                 'project:mobile:focus:releng:googleplay:product:reference-browser': 'reference-browser-repo',
-                'project:mobile:focus:releng:googleplay:product:reference-browser:dep': 'reference-browser-repo',
-                'project:mobile:reference-browser:releng:signing:cert:dep-signing': 'reference-browser-repo',
                 'project:mobile:reference-browser:releng:signing:cert:release-signing': 'reference-browser-repo',
 
                 'project:mobile:android-components:releng:beetmover:bucket:maven-production': 'android-components-repo',
