@@ -22,6 +22,14 @@ STATUSES = {
     'intermittent-task': 7,
 }
 
+_ALLOWED_MOBILE_GITHUB_OWNERS = (
+    'mozilla-mobile',
+    # Owners below are allowed to run staging releases
+    'JohanLorenzo',
+    'MihaiTabara',
+    'mitchhentges',
+)
+
 # DEFAULT_CONFIG {{{1
 # When making changes to DEFAULT_CONFIG that may be of interest to scriptworker
 # instance maintainers, also make changes to ``scriptworker.yaml.tmpl``.
@@ -162,11 +170,12 @@ DEFAULT_CONFIG = frozendict({
         "gecko-1-decision",
         "gecko-2-decision",
         "gecko-3-decision",
-        # gecko-focus is for mozilla-mobile releases. It's named this way because it's a worker type
-        # but using the gecko ChainOfTrust keys. See bug 1455290 for more details.
+        # gecko-focus was for mozilla-mobile releases (bug 1455290) for more details.
+        # TODO: Remove it once not used anymore
         "gecko-focus",
-        # staging releases can run on the regular github-worker.
-        "github-worker",
+        "mobile-1-decision",
+        "mobile-2-decision",
+        "mobile-3-decision",
     ),
 
     # docker-image cot
@@ -209,9 +218,15 @@ DEFAULT_CONFIG = frozendict({
                 "path_regexes": (
                     # XXX We allow Github forks to run staging releases. Please make sure to
                     # restrict production scopes to the origin repo (with cot_restricted_scopes)!
-                    r"^(?P<path>/[A-Za-z0-9-]+/android-components)(/|.git|$)",
-                    r"^(?P<path>/[A-Za-z0-9-]+/focus-android)(/|.git|$)",
-                    r"^(?P<path>/[A-Za-z0-9-]+/reference-browser)(/|.git|$)",
+                    r"^(?P<path>/({})/android-components)(/|.git|$)".format(
+                        '|'.join(_ALLOWED_MOBILE_GITHUB_OWNERS)
+                    ),
+                    r"^(?P<path>/({})/focus-android)(/|.git|$)".format(
+                        '|'.join(_ALLOWED_MOBILE_GITHUB_OWNERS)
+                    ),
+                    r"^(?P<path>/({})/reference-browser)(/|.git|$)".format(
+                        '|'.join(_ALLOWED_MOBILE_GITHUB_OWNERS)
+                    ),
                 ),
             }),),
         }),
@@ -266,13 +281,15 @@ DEFAULT_CONFIG = frozendict({
                 'project:comm:thunderbird:releng:signing:cert:release-signing': 'all-release-branches',
             }),
             'mobile': frozendict({
-                'project:mobile:focus:googleplay:product:focus': 'focus-origin-repo',
-                'project:mobile:focus:releng:signing:cert:release-signing': 'focus-origin-repo',
-                'project:mobile:focus:releng:googleplay:product:reference-browser': 'reference-browser-origin-repo',
-                'project:mobile:focus:releng:googleplay:product:reference-browser:dep': 'reference-browser-origin-repo',
-                'project:mobile:reference-browser:releng:signing:cert:dep-signing': 'reference-browser-origin-repo',
-                'project:mobile:reference-browser:releng:signing:cert:release-signing': 'reference-browser-origin-repo',
-                'project:mobile:android-components:releng:beetmover:bucket:maven-production': 'android-components-origin-repo',
+                'project:mobile:focus:googleplay:product:focus': 'focus-repo',
+                'project:mobile:focus:releng:signing:cert:release-signing': 'focus-repo',
+
+                'project:mobile:focus:releng:googleplay:product:reference-browser': 'reference-browser-repo',
+                'project:mobile:focus:releng:googleplay:product:reference-browser:dep': 'reference-browser-repo',
+                'project:mobile:reference-browser:releng:signing:cert:dep-signing': 'reference-browser-repo',
+                'project:mobile:reference-browser:releng:signing:cert:release-signing': 'reference-browser-repo',
+
+                'project:mobile:android-components:releng:beetmover:bucket:maven-production': 'android-components-repo',
             }),
         }),
     },
@@ -363,13 +380,13 @@ DEFAULT_CONFIG = frozendict({
                 ),
             }),
             'mobile': frozendict({
-                'focus-origin-repo': (
+                'focus-repo': (
                     '/mozilla-mobile/focus-android',
                 ),
-                'reference-browser-origin-repo': (
-                    '/mozilla-mobile/reference-browser'
+                'reference-browser-repo': (
+                    '/mozilla-mobile/reference-browser',
                 ),
-                'android-components-origin-repo': (
+                'android-components-repo': (
                     '/mozilla-mobile/android-components',
                 ),
             }),
