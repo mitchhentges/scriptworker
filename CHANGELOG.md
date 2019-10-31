@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [upcoming major]
+### Changed
+- Scripts can now generate config themselves before calling `sync_main(...)`. If you need the old config-generation logic, you can use `client.load_config_with_default(...)`
+
 ## [27.1.0] - 2019-10-28
 ### Added
 - added `mpd001` CoT support

@@ -239,7 +239,7 @@ async def test_sync_main_runs_fully(config, should_validate_task):
         json.dump(config, f)
         f.seek(0)
 
-        kwargs['config_path'] = f.name
+        kwargs['config'] = client.load_config_with_default(f.name)
         client.sync_main(async_main, **kwargs)
 
     for i in run_until_complete_calls:

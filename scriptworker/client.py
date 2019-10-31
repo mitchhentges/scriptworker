@@ -133,22 +133,38 @@ def validate_artifact_url(valid_artifact_rules, valid_artifact_task_ids, url):
     return unquote(filepath).lstrip('/')
 
 
-def sync_main(async_main, config_path=None, default_config=None,
-              should_validate_task=True, loop_function=asyncio.get_event_loop):
-    """Entry point for scripts using scriptworker.
+def load_config_with_default(config_path=None, default_config=None):
+    """Loads config from file with backing default values
 
-    This function sets up the basic needs for a script to run. More specifically:
-        * it creates the scriptworker context and initializes it with the provided config
-        * the path to the config file is either taken from `config_path` or from `sys.argv[1]`.
-        * it verifies `sys.argv` doesn't have more arguments than the config path.
-        * it creates the asyncio event loop so that `async_main` can run
+    If ``config_path`` is ``None``, this function will validate that the path is provided in
+    ``sys.argv[1]``, exiting the program if it isn't.
 
     Args:
-        async_main (function): The function to call once everything is set up
         config_path (str, optional): The path to the file to load the config from.
             Loads from ``sys.argv[1]`` if ``None``. Defaults to None.
         default_config (dict, optional): the default config to use for ``_init_context``.
             defaults to None.
+    """
+
+    if config_path is None:
+        if len(sys.argv) != 2:
+            _usage()
+        config_path = sys.argv[1]
+
+    config = {} if default_config is None else default_config
+    config.update(load_json_or_yaml(config_path, is_path=True))
+    return config
+
+
+def sync_main(async_main, config, should_validate_task=True, loop_function=asyncio.get_event_loop):
+    """Entry point for scripts using scriptworker.
+
+    This function sets up the basic needs for a script to run. More specifically:
+        * it creates the scriptworker context and initializes it with the provided config
+        * it creates the asyncio event loop so that `async_main` can run
+
+    Args:
+        async_main (function): The function to call once everything is set up
         should_validate_task (bool, optional): whether we should validate the task
             schema. Defaults to True.
         loop_function (function, optional): the function to call to get the
@@ -156,7 +172,7 @@ def sync_main(async_main, config_path=None, default_config=None,
             ``asyncio.get_event_loop``.
 
     """
-    context = _init_context(config_path, default_config)
+    context = _init_context(config)
     _init_logging(context)
     if should_validate_task:
         validate_task_schema(context)
@@ -164,22 +180,15 @@ def sync_main(async_main, config_path=None, default_config=None,
     loop.run_until_complete(_handle_asyncio_loop(async_main, context))
 
 
-def _init_context(config_path=None, default_config=None):
+def _init_context(config):
     context = Context()
 
     # This prevents *script from overwriting json on disk
     context.write_json = lambda *args: None
     context.write_json()  # for coverage
 
-    if config_path is None:
-        if len(sys.argv) != 2:
-            _usage()
-        config_path = sys.argv[1]
-
-    context.config = {} if default_config is None else default_config
-    context.config.update(load_json_or_yaml(config_path, is_path=True))
-
-    context.task = get_task(context.config)
+    context.config = config
+    context.task = get_task(config)
 
     return context
 
